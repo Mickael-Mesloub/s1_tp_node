@@ -17,7 +17,7 @@ const { APP_PORT, APP_LOCALHOST } = process.env;
 dayjs.extend(localizedFormat);
 dayjs.locale('fr');
 
-const server = createServer((req, res) => {
+const server = createServer((_, res) => {
   try {
     // parse data.json file
     const fileJSON = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
