@@ -1,0 +1,16 @@
+doctype html
+html(lang="fr")
+    head
+        meta(charset="UTF-8")
+        block title
+
+        link(rel="stylesheet" href="../assets/styles.css")
+        block styles
+
+        script(src="https://polyfill.io/v3/polyfill.min.js")
+    body
+        header
+            include nav.pug
+        main.container
+            block content
+        block scripts

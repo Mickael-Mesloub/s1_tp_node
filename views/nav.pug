@@ -1,0 +1,17 @@
+script. 
+    //- // script to dynamically add 'active' class based on the current URL for navbar links
+    document.addEventListener('DOMContentLoaded', () => {
+        const navbarItems = document.querySelectorAll('.navbar-item');
+        navbarItems.forEach(item => {
+            const link = item.querySelector('.navbar-link');
+            if (link.href === window.location.href) {
+                item.classList.add('active');
+            }
+        });
+    });
+
+
+nav
+    ul.navbar
+        li.navbar-item: a(href="/" class="navbar-link") Home
+        li.navbar-item: a(href="/users" class="navbar-link") Users

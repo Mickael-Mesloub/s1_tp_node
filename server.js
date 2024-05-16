@@ -17,8 +17,22 @@ const { APP_PORT, APP_LOCALHOST } = process.env;
 dayjs.extend(localizedFormat);
 dayjs.locale('fr');
 
-const server = createServer((_, res) => {
+const server = createServer((req, res) => {
   try {
+    const url = req.url;
+
+    if (url && url.includes('styles')) {
+      const css = readFileSync(`${__dirname}/${url}`);
+      try {
+        res.writeHead(200, { 'Content-Type': 'text/css' });
+        res.write(css);
+        res.end();
+        return;
+      } catch (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Erreur lors du chargement du fichier de styles.');
+      }
+    }
     // parse data.json file
     const fileJSON = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
 
@@ -30,8 +44,8 @@ const server = createServer((_, res) => {
       user.birth = dayjs(user.birth).format('LL');
     }
 
-    // compile pug template file to send it in response to client
-    const compile = compileFile('./views/template.pug', { pretty: true });
+    // compile pug home file to send it in response to client
+    const compile = compileFile('./views/home.pug', { pretty: true });
     const result = compile({ users });
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });

@@ -1,0 +1,10 @@
+extends layout.pug
+
+block title
+    title TP Node - Home
+
+block content
+    ul
+        each user in users
+            li= user.name
+            li= user.birth
