@@ -1,14 +1,31 @@
 const http = require('http');
 const pug = require('pug');
+const fs = require('fs');
 require('dotenv').config();
+
+const { createServer } = http;
+const { compileFile } = pug;
+const { readFileSync } = fs;
+
+// env variables
 const { APP_PORT, APP_LOCALHOST } = process.env;
 
-const server = http.createServer((req, res) => {
+const server = createServer((req, res) => {
   try {
+    // TODO: remove this mock variable when real data is ready
     const data = {
       username: 'Mickaël',
     };
-    const compile = pug.compileFile('./views/template.pug', { pretty: true });
+
+    // parse data.json file
+    const fileJSON = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
+
+    // get the array of users from json file
+    const { users } = fileJSON;
+    console.log(users);
+
+    // compile pug template file to send it in response to client
+    const compile = compileFile('./views/template.pug', { pretty: true });
     const result = compile(data);
 
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
