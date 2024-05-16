@@ -21,6 +21,7 @@ const server = createServer((req, res) => {
   try {
     const url = req.url;
 
+    // load css file
     if (url && url.includes('styles')) {
       const css = readFileSync(`${__dirname}/${url}`);
       try {
