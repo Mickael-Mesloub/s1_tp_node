@@ -1,6 +1,9 @@
 const http = require('http');
 const pug = require('pug');
 const fs = require('fs');
+const dayjs = require('dayjs');
+const localizedFormat = require('dayjs/plugin/localizedFormat');
+require('dayjs/locale/fr');
 require('dotenv').config();
 
 const { createServer } = http;
@@ -10,6 +13,10 @@ const { readFileSync } = fs;
 // env variables
 const { APP_PORT, APP_LOCALHOST } = process.env;
 
+// declare locale as 'fr' to convert dates into French format
+dayjs.extend(localizedFormat);
+dayjs.locale('fr');
+
 const server = createServer((req, res) => {
   try {
     // parse data.json file
@@ -17,6 +24,11 @@ const server = createServer((req, res) => {
 
     // get the array of users from json file
     const { users } = fileJSON;
+
+    // convert users' birthdate into French format
+    for (const user of users) {
+      user.birth = dayjs(user.birth).format('LL');
+    }
 
     // compile pug template file to send it in response to client
     const compile = compileFile('./views/template.pug', { pretty: true });
