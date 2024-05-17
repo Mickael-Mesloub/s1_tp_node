@@ -69,8 +69,6 @@ const server = createServer((req, res) => {
           let birth;
 
           /**
-           * TODO: handle empty strings in text input
-           * TODO: handle delete student in /students
            * TODO: if time remaining, clean and refactor this file
            */
 
