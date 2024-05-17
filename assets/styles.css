@@ -9,13 +9,15 @@ body {
 }
 
 .navbar,
-.container {
+.container,
+.not-found-container {
   display: flex;
 }
 
 .navbar-link,
 .container li,
-h2 {
+h2,
+.go-back-home {
   color: rgba(220, 220, 220, 0.9);
 }
 
@@ -42,7 +44,8 @@ h2 {
   }
 }
 
-.navbar-link {
+.navbar-link,
+.go-back-home {
   text-decoration: none;
 }
 
@@ -70,4 +73,26 @@ h2 {
 
 .no-student-msg {
   color: rgba(255, 103, 103, 0.9);
+}
+
+.not-found-container {
+  padding: 50px;
+  gap: 50px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.go-back-home {
+  border: 1px solid rgba(220, 220, 220, 0.9);
+  transition: all 200ms ease-in-out;
+  padding: 0.5rem 1.2rem;
+  list-style-type: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+
+  &:hover {
+    border-color: rgb(36, 157, 82);
+    color: rgb(36, 157, 82);
+  }
 }

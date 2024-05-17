@@ -1,0 +1,14 @@
+extends layout.pug
+
+block title
+    title TP Node - Not Found
+
+block vars 
+    - const isHeaderHidden = true;
+
+block content
+    .not-found-container
+        h2.not-found-title Error 404: Page not found
+        a.go-back-home(href="/") Go back home
+    
+    

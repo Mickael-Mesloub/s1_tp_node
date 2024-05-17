@@ -8,8 +8,10 @@ html(lang="fr")
         block styles
 
     body
-        header
-            include nav.pug
+        block vars
+        unless isHeaderHidden
+            header
+                include nav.pug
         main.container
             block content
             

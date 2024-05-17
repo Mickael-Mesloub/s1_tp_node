@@ -63,6 +63,12 @@ const server = createServer((req, res) => {
           let birth;
           console.log(body);
 
+          /**
+           * TODO: handle empty strings in text input
+           * TODO: handle delete student in /students
+           * TODO: add 404 not found page
+           */
+
           // regex to check if we receive name={name}&birth={date}
           const regex = /name=([^&]+)&birth=([^&]+)/;
 
@@ -102,7 +108,7 @@ const server = createServer((req, res) => {
       try {
         // compile pug home file to send it in response to client
         const compile = compileFile('./views/home.pug', { pretty: true });
-        const result = compile({ students, formatDate });
+        const result = compile();
 
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
@@ -114,9 +120,21 @@ const server = createServer((req, res) => {
       console.log(url, method);
 
       try {
-        // compile pug home file to send it in response to client
+        // students page (/students)
         const compile = compileFile('./views/students.pug', { pretty: true });
         const result = compile({ students, formatDate });
+
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(result);
+      } catch (err) {
+        const message = 'Error compiling the Pug template';
+        handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+      }
+    } else {
+      try {
+        // not found page
+        const compile = compileFile('./views/not-found.pug', { pretty: true });
+        const result = compile();
 
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
