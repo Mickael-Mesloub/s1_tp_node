@@ -2,10 +2,12 @@ extends layout.pug
 block title
     title TP Node - Students
 block content
-    ul
+    h2 Students
+    ul.student-list
         //- if students array doesn't exist or if it is empty, show a msg
         if !students || students.length === 0
             p.no-student-msg No student registered yet. 
         else
             each student in students
-                li= `Name: ${student.name} - Birthdate: ${formatDate(student.birth)}` 
+                li.student-list-item= `Name: ${student.name} - Birthdate: ${formatDate(student.birth)}`
+                    button Delete student

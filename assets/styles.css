@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 body {
@@ -21,6 +22,15 @@ h2,
   color: rgba(220, 220, 220, 0.9);
 }
 
+button {
+  background-color: rgba(171, 78, 78, 0.995);
+  padding: 0.25rem 1.2rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
 /* ----- Navbar ----- */
 
 .navbar {
@@ -34,7 +44,6 @@ h2,
   transition: all 200ms ease-in-out;
   border: 2px solid transparent;
   padding: 0.5rem 1.2rem;
-  list-style-type: none;
   border-radius: 12px;
   font-size: 1.2rem;
   cursor: pointer;
@@ -73,7 +82,7 @@ h2,
 }
 
 .no-student-msg {
-  color: rgba(255, 103, 103, 0.9);
+  color: rgba(222, 53, 53, 0.9);
 }
 
 .not-found-container {
@@ -88,7 +97,6 @@ h2,
   border: 1px solid rgba(220, 220, 220, 0.9);
   transition: all 200ms ease-in-out;
   padding: 0.5rem 1.2rem;
-  list-style-type: none;
   border-radius: 12px;
   font-size: 1.2rem;
 
@@ -96,4 +104,8 @@ h2,
     border-color: rgb(36, 157, 82);
     color: rgb(36, 157, 82);
   }
+}
+
+.student-list-item {
+  padding: 2rem;
 }
