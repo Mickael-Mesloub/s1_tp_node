@@ -25,4 +25,4 @@ block content
         else
             each student, index in students
                 li.student-list-item= `${index + 1} - Name: ${student.name} - Birthdate: ${formatDate(student.birth)}`
-                    button.delete-student-btn(data-studentIndex = index) Delete student
+                    a.delete-student-btn(href=`/students/delete/${student.name}`) Delete student

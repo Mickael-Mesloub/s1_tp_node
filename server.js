@@ -6,13 +6,19 @@ require('dotenv').config();
 
 const { createServer } = http;
 const { compileFile } = pug;
-const { readFileSync } = fs;
+const { readFileSync, writeFileSync } = fs;
 
 // env variables from .env file
 const { APP_ENV, APP_PORT, APP_LOCALHOST } = process.env;
 
 // functions from utils file
-const { defineEnvMessage, handleError, formatDate, capitalize } = u;
+const {
+  defineEnvMessage,
+  handleError,
+  formatDate,
+  capitalize,
+  filterStudentsArray,
+} = u;
 
 const server = createServer((req, res) => {
   try {
@@ -61,7 +67,6 @@ const server = createServer((req, res) => {
         try {
           let name;
           let birth;
-          console.log(body);
 
           /**
            * TODO: handle empty strings in text input
@@ -81,20 +86,21 @@ const server = createServer((req, res) => {
             birth = match[2];
           }
 
-          if (name && birth) {
+          if (!name || name === '' || !birth || birth === '') {
+            const message = 'Invalid data format.';
+            handleError({ env: APP_ENV, res, statusCode: 400, message });
+          } else {
             students.push({ name, birth });
 
             const newData = JSON.stringify({ students });
-            fs.writeFileSync('./Data/data.json', newData);
-            console.log('JSON file updated successfully!');
-            console.log(students);
+            writeFileSync('./Data/data.json', newData);
+            console.log(
+              `New student "${name}" added and JSON file updated successfully!`
+            );
 
             // redirect to /students after handling the request
             res.writeHead(301, { Location: '/students' });
             res.end();
-          } else {
-            const message = 'Invalid data format';
-            handleError({ env: APP_ENV, res, statusCode: 400, message });
           }
         } catch (err) {
           const message = 'Error processing the form data';
@@ -128,6 +134,19 @@ const server = createServer((req, res) => {
         const message = 'Error compiling the Pug template';
         handleError({ env: APP_ENV, res, statusCode: 500, message, err });
       }
+    } else if (url.includes('delete') && method === 'GET') {
+      const name = url.split('/').pop();
+
+      const newStudents = filterStudentsArray({ students, name });
+      const newData = JSON.stringify({ students: newStudents });
+      writeFileSync('./Data/data.json', newData);
+      console.log(
+        `Student "${name}" deleted and JSON file updated successfully!`
+      );
+
+      // redirect to /students after deleting student
+      res.writeHead(301, { Location: '/students' });
+      res.end();
     } else {
       try {
         // not found page

@@ -39,9 +39,16 @@ const capitalize = (str) => {
   return str.replace(str[0], str[0].toUpperCase());
 };
 
+// filter the array of students (to delete a student)
+const filterStudentsArray = ({ students, name }) => {
+  const newArray = students.filter((s) => s.name !== name);
+  return newArray;
+};
+
 module.exports = {
   defineEnvMessage,
   handleError,
   formatDate,
   capitalize,
+  filterStudentsArray,
 };
