@@ -8,5 +8,4 @@ block content
             p.no-student-msg No student registered yet. 
         else
             each student in students
-                li= student.name
-                li= formatDate(student.birth)
+                li= `Name: ${student.name} - Birthdate: ${formatDate(student.birth)}` 
