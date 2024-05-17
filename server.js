@@ -1,10 +1,7 @@
 const http = require('http');
 const pug = require('pug');
 const fs = require('fs');
-const dayjs = require('dayjs');
-const localizedFormat = require('dayjs/plugin/localizedFormat');
 const u = require('./utils/utils');
-require('dayjs/locale/fr');
 require('dotenv').config();
 
 const { createServer } = http;
@@ -15,15 +12,12 @@ const { readFileSync } = fs;
 const { APP_ENV, APP_PORT, APP_LOCALHOST } = process.env;
 
 // functions from utils file
-const { defineEnvMessage, handleError } = u;
-
-// declare locale as 'fr' to convert dates into French format
-dayjs.extend(localizedFormat);
-dayjs.locale('fr');
+const { defineEnvMessage, handleError, formatDate } = u;
 
 const server = createServer((req, res) => {
   try {
     const url = req.url;
+    const method = req.method;
 
     // load css file
     if (url && url.includes('styles')) {
@@ -34,7 +28,7 @@ const server = createServer((req, res) => {
         res.write(css);
         res.end();
       } catch (err) {
-        const message = 'Erreur lors du chargement du fichier de styles';
+        const message = 'Error loading the stylesheet file';
         handleError({ env: APP_ENV, res, statusCode: 404, message, err });
       }
 
@@ -46,42 +40,77 @@ const server = createServer((req, res) => {
     try {
       JSONFile = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
     } catch (err) {
-      const message = 'Erreur lors de la lecture du fichier JSON';
+      const message = 'Error reading the JSON file';
       handleError({ env: APP_ENV, res, statusCode: 500, message, err });
       return;
     }
 
-    // get the array of users from json file
-    const { users } = JSONFile;
+    // get the array of students from json file
+    const { students } = JSONFile;
 
-    if (!users) {
-      const message = 'Erreur lors de la récupération des utilisateurs';
+    if (!students) {
+      const message = 'Error retrieving users';
       handleError({ env: APP_ENV, res, statusCode: 404, message });
 
       return;
-    }
-
-    // convert users' birthdate into French format
-    for (const user of users) {
-      user.birth = dayjs(user.birth).format('LL');
     }
 
     let result;
     try {
       // compile pug home file to send it in response to client
       const compile = compileFile('./views/home.pug', { pretty: true });
-      result = compile({ users });
+      result = compile({ students, formatDate });
+
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(result);
     } catch (err) {
-      const message = 'Erreur lors de la compilation du template Pug';
+      const message = 'Error compiling the Pug template';
       handleError({ env: APP_ENV, res, statusCode: 500, message, err });
 
       return;
     }
 
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(result);
+    if (url === '/' && method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', () => {
+        let name;
+        let birth;
+        console.log(body);
+
+        try {
+          // regex to check if we receive name={name}&birth={date}
+          const regex = /name=([^&]+)&birth=([^&]+)/;
+
+          // check if the response body matches the regex
+          const match = body.match(regex);
+
+          // asign values to name and birth if it matches
+          if (match) {
+            name = match[1];
+            birth = match[2];
+          }
+
+          if (name && birth) {
+            students.push({ name, birth });
+          }
+
+          const newData = JSON.stringify({ students });
+          fs.writeFileSync('./Data/data.json', newData);
+          console.log('JSON file updated successfully!');
+          console.log(students);
+          res.end();
+          return;
+        } catch (err) {
+          const message = '';
+          handleError({ APP_ENV, res, statusCode: 404, message, err });
+        }
+      });
+    }
   } catch (err) {
-    const message = 'Erreur serveur';
+    const message = 'Internal server error';
     handleError({ env: APP_ENV, res, statusCode: 500, message, err });
 
     return;

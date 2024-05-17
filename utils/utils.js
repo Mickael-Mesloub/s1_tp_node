@@ -1,3 +1,9 @@
+const dayjs = require('dayjs');
+const localizedFormat = require('dayjs/plugin/localizedFormat');
+require('dayjs/locale/en');
+dayjs.extend(localizedFormat);
+dayjs.locale('en');
+
 // adapt the message in console depending on environment
 const defineEnvMessage = (env) => {
   let environmentMessage;
@@ -23,7 +29,13 @@ const handleError = ({ env, res, statusCode, message, err }) => {
   res.end(errorMessage);
 };
 
+// date formatter
+const formatDate = (date) => {
+  return dayjs(date).format('LL');
+};
+
 module.exports = {
   defineEnvMessage,
   handleError,
+  formatDate,
 };
