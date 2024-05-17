@@ -1,16 +1,8 @@
 extends layout.pug
-
 block title
     title TP Node - Home
 
 block content
     h2 Add student
     include form.pug
-    ul
-        //- if students array doesn't exist or if it is empty, show a msg
-        if !students || students.length === 0
-            p.no-student-msg No student registered yet. 
-        else
-            each student in students
-                li= student.name
-                li= formatDate(student.birth)
+    
