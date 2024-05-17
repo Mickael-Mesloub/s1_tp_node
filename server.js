@@ -25,7 +25,7 @@ const server = createServer((req, res) => {
     const url = req.url;
     const method = req.method;
 
-    // load css file
+    // load CSS file
     if (url && url.includes('styles')) {
       try {
         const css = readFileSync(`${__dirname}/${url}`);
@@ -49,7 +49,7 @@ const server = createServer((req, res) => {
       return;
     }
 
-    // get the array of students from json file
+    // retrieve the array of students from JSON file
     const { students } = JSONFile;
 
     if (!students) {
@@ -68,10 +68,6 @@ const server = createServer((req, res) => {
           let name;
           let birth;
 
-          /**
-           * TODO: if time remaining, clean and refactor this file
-           */
-
           // regex to check if we receive name={name}&birth={date}
           const regex = /name=([^&]+)&birth=([^&]+)/;
 
@@ -84,13 +80,16 @@ const server = createServer((req, res) => {
             birth = match[2];
           }
 
+          // if we receive undefined or empty strings, display an error message
           if (!name || name === '' || !birth || birth === '') {
             const message = 'Invalid data format.';
             handleError({ env: APP_ENV, res, statusCode: 400, message });
           } else {
+            // if everything is ok, add new student in students array
             students.push({ name, birth });
 
             const newData = JSON.stringify({ students });
+            // rewrite JSON file with the new array (with the student freshly created)
             writeFileSync('./Data/data.json', newData);
             console.log(
               `New student "${name}" added and JSON file updated successfully!`
@@ -133,16 +132,21 @@ const server = createServer((req, res) => {
         handleError({ env: APP_ENV, res, statusCode: 500, message, err });
       }
     } else if (url.includes('delete') && method === 'GET') {
+      // retrieve name from url (url is /students/delete/{name})
       const name = url.split('/').pop();
 
+      // new array without the student we want to delete
       const newStudents = filterStudentsArray({ students, name });
+
       const newData = JSON.stringify({ students: newStudents });
+
+      // rewrite the JSON file with the new array (without the student we want to delete)
       writeFileSync('./Data/data.json', newData);
       console.log(
         `Student "${name}" deleted and JSON file updated successfully!`
       );
 
-      // redirect to /students after deleting student
+      // redirect to /students after deleting student to update the student list
       res.writeHead(301, { Location: '/students' });
       res.end();
     } else {

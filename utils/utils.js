@@ -34,12 +34,13 @@ const formatDate = (date) => {
   return dayjs(date).format('LL');
 };
 
-// capitalize the first letter of a string
+// capitalizes the first letter of a string
 const capitalize = (str) => {
   return str.replace(str[0], str[0].toUpperCase());
 };
 
-// filter the array of students (to delete a student)
+// checks in the array of students if a student with the name we passed in params exists,
+// and if so, returns a new array filtered, without this student
 const filterStudentsArray = ({ students, name }) => {
   const newArray = students.filter((s) => s.name !== name);
   return newArray;
