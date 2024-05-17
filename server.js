@@ -66,7 +66,6 @@ const server = createServer((req, res) => {
           /**
            * TODO: handle empty strings in text input
            * TODO: handle delete student in /students
-           * TODO: add 404 not found page
            */
 
           // regex to check if we receive name={name}&birth={date}
@@ -117,8 +116,6 @@ const server = createServer((req, res) => {
         handleError({ env: APP_ENV, res, statusCode: 500, message, err });
       }
     } else if (url === '/students' && method === 'GET') {
-      console.log(url, method);
-
       try {
         // students page (/students)
         const compile = compileFile('./views/students.pug', { pretty: true });
