@@ -34,8 +34,14 @@ const formatDate = (date) => {
   return dayjs(date).format('LL');
 };
 
+// capitalize the first letter of a string
+const capitalize = (str) => {
+  return str.replace(str[0], str[0].toUpperCase());
+};
+
 module.exports = {
   defineEnvMessage,
   handleError,
   formatDate,
+  capitalize,
 };
