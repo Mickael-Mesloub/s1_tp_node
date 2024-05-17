@@ -23,12 +23,16 @@ h2,
 }
 
 button {
-  background-color: rgba(171, 78, 78, 0.995);
-  padding: 0.25rem 1.2rem;
+  padding: 0.5rem 1.2rem;
   font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
   border: 1px solid transparent;
+}
+
+input {
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
 }
 
 /* ----- Navbar ----- */
@@ -108,4 +112,16 @@ button {
 
 .student-list-item {
   padding: 2rem;
+}
+
+.delete-student-btn {
+  background-color: rgba(171, 78, 78, 0.995);
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.add-user-btn {
+  background-color: rgb(36, 157, 82);
 }

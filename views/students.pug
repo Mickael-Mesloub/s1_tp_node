@@ -1,4 +1,19 @@
 extends layout.pug
+
+block scripts
+
+    script. 
+        //- script to delete students
+        document.addEventListener('DOMContentLoaded', () => {
+            const deleteBtns = document.querySelectorAll('.delete-student-btn');
+            deleteBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    console.log('clicked', e.target.dataset)
+                })
+            });
+        });
+
+
 block title
     title TP Node - Students
 block content
@@ -8,6 +23,6 @@ block content
         if !students || students.length === 0
             p.no-student-msg No student registered yet. 
         else
-            each student in students
-                li.student-list-item= `Name: ${student.name} - Birthdate: ${formatDate(student.birth)}`
-                    button Delete student
+            each student, index in students
+                li.student-list-item= `${index + 1} - Name: ${student.name} - Birthdate: ${formatDate(student.birth)}`
+                    button.delete-student-btn(data-studentIndex = index) Delete student
