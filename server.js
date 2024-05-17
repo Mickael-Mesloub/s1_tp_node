@@ -15,7 +15,7 @@ const { readFileSync } = fs;
 const { APP_ENV, APP_PORT, APP_LOCALHOST } = process.env;
 
 // functions from utils file
-const { defineEnvMessage } = u;
+const { defineEnvMessage, handleError } = u;
 
 // declare locale as 'fr' to convert dates into French format
 dayjs.extend(localizedFormat);
@@ -27,50 +27,64 @@ const server = createServer((req, res) => {
 
     // load css file
     if (url && url.includes('styles')) {
-      const css = readFileSync(`${__dirname}/${url}`);
       try {
+        const css = readFileSync(`${__dirname}/${url}`);
+
         res.writeHead(200, { 'Content-Type': 'text/css' });
         res.write(css);
         res.end();
-        return;
       } catch (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-
-        if (APP_ENV === 'development') {
-          res.end(`Erreur lors du chargement du fichier de styles: ${err}`);
-          return;
-        }
-
-        res.end('Erreur lors du chargement du fichier de styles.');
+        const message = 'Erreur lors du chargement du fichier de styles';
+        handleError({ env: APP_ENV, res, statusCode: 404, message, err });
       }
+
+      return;
     }
+
     // parse data.json file
-    const fileJSON = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
+    let JSONFile;
+    try {
+      JSONFile = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
+    } catch (err) {
+      const message = 'Erreur lors de la lecture du fichier JSON';
+      handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+      return;
+    }
 
     // get the array of users from json file
-    const { users } = fileJSON;
+    const { users } = JSONFile;
+
+    if (!users) {
+      const message = 'Erreur lors de la récupération des utilisateurs';
+      handleError({ env: APP_ENV, res, statusCode: 404, message });
+
+      return;
+    }
 
     // convert users' birthdate into French format
     for (const user of users) {
       user.birth = dayjs(user.birth).format('LL');
     }
 
-    // compile pug home file to send it in response to client
-    const compile = compileFile('./views/home.pug', { pretty: true });
-    const result = compile({ users });
+    let result;
+    try {
+      // compile pug home file to send it in response to client
+      const compile = compileFile('./views/home.pug', { pretty: true });
+      result = compile({ users });
+    } catch (err) {
+      const message = 'Erreur lors de la compilation du template Pug';
+      handleError({ env: APP_ENV, res, statusCode: 500, message, err });
 
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(result);
-    return;
-  } catch (err) {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-
-    if (APP_ENV === 'development') {
-      res.end(`Erreur lors de la compilation: ${err} `);
       return;
     }
 
-    res.end('Erreur lors de la lecture du fichier');
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(result);
+  } catch (err) {
+    const message = 'Erreur serveur';
+    handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+
+    return;
   }
 });
 

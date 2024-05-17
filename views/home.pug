@@ -5,6 +5,10 @@ block title
 
 block content
     ul
-        each user in users
-            li= user.name
-            li= user.birth
+        //- if users array doesn't exist or if it is empty, show a msg
+        if !users || users.length === 0
+            p.no-user-msg Aucun utilisateur enregistré. 
+        else
+            each user in users
+                li= user.name
+                li= user.birth

@@ -66,3 +66,8 @@ body {
 .container li {
   color: rgba(220, 220, 220, 0.9);
 }
+
+.no-user-msg {
+  color: rgba(255, 103, 103, 0.9);
+  font-weight: 600;
+}
