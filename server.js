@@ -66,6 +66,7 @@ const server = createServer((req, res) => {
           /**
            * TODO: handle empty strings in text input
            * TODO: handle delete student in /students
+           * TODO: if time remaining, clean and refactor this file
            */
 
           // regex to check if we receive name={name}&birth={date}
