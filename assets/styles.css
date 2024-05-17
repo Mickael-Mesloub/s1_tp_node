@@ -22,7 +22,8 @@ h2,
   color: rgba(220, 220, 220, 0.9);
 }
 
-button {
+button,
+.delete-student-btn {
   padding: 0.5rem 1.2rem;
   font-weight: 600;
   border-radius: 4px;
@@ -59,7 +60,8 @@ input {
 }
 
 .navbar-link,
-.go-back-home {
+.go-back-home,
+.delete-student-btn {
   text-decoration: none;
 }
 
@@ -87,7 +89,8 @@ input {
 }
 
 .no-student-msg {
-  color: rgba(222, 53, 53, 0.9);
+  color: rgba(171, 78, 78, 0.995);
+  font-size: 1.2rem;
 }
 
 .not-found-container {
@@ -113,10 +116,14 @@ input {
 
 .student-list-item {
   padding: 2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 .delete-student-btn {
   background-color: rgba(171, 78, 78, 0.995);
+  color: rgba(10, 10, 10, 0.95);
 
   &:hover {
     opacity: 0.75;
