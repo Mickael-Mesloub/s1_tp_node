@@ -2,10 +2,10 @@ const fs = require('fs');
 const { handleError, errorMessages } = require('../utils/error.utils');
 const { capitalize } = require('../utils/string.utils');
 const { filterStudentsArray } = require('../utils/student.utils');
-
 const { writeFileSync } = fs;
 const { invalidDataFormat, errorProcessingFormData } = errorMessages;
 
+// creates a new student and adds it in the array of students of the data.json file
 const addStudent = ({ req, res, students }) => {
   let body = '';
   req.on('data', (chunk) => {
@@ -46,7 +46,7 @@ const addStudent = ({ req, res, students }) => {
           `New student "${name}" added and JSON file updated successfully!`
         );
 
-        // redirect to /students after handling the request
+        // redirect to /students once the request is handled
         res.writeHead(301, { Location: '/students' });
         res.end();
       }
@@ -61,6 +61,7 @@ const addStudent = ({ req, res, students }) => {
   });
 };
 
+// deletes a student from the students array in the data.json file
 const deleteStudent = ({ res, url, students }) => {
   // retrieve name from url (url is /students/delete/{name})
   const name = url.split('/').pop();
