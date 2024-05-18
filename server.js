@@ -45,7 +45,7 @@ const server = createServer((req, res) => {
         res.write(css);
         res.end();
       } catch (err) {
-        handleError({
+        return handleError({
           res,
           statusCode: 404,
           message: errorLoadingStylesheet,
@@ -60,16 +60,23 @@ const server = createServer((req, res) => {
     try {
       JSONFile = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
     } catch (err) {
-      handleError({ res, statusCode: 500, message: errorReadingJSON, err });
-      return;
+      return handleError({
+        res,
+        statusCode: 500,
+        message: errorReadingJSON,
+        err,
+      });
     }
 
     // retrieve the array of students from JSON file
     const { students } = JSONFile;
 
     if (!students) {
-      handleError({ res, statusCode: 404, message: errorRetrievingStudents });
-      return;
+      return handleError({
+        res,
+        statusCode: 404,
+        message: errorRetrievingStudents,
+      });
     }
 
     if (url === '/' && method === 'POST') {
@@ -96,7 +103,11 @@ const server = createServer((req, res) => {
 
           // if we receive undefined or empty strings, display an error message
           if (!name || name === '' || !birth || birth === '') {
-            handleError({ res, statusCode: 400, message: invalidDataFormat });
+            return handleError({
+              res,
+              statusCode: 400,
+              message: invalidDataFormat,
+            });
           } else {
             // if everything is ok, add new student in students array
             students.push({ name, birth });
@@ -113,7 +124,7 @@ const server = createServer((req, res) => {
             res.end();
           }
         } catch (err) {
-          handleError({
+          return handleError({
             res,
             statusCode: 500,
             message: errorProcessingFormData,
@@ -133,13 +144,14 @@ const server = createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
       } catch (err) {
-        handleError({
+        return handleError({
           res,
           statusCode: 500,
           message: errorCompilingPugTemplate,
           err,
         });
       }
+      return;
     } else if (url === '/students' && method === 'GET') {
       try {
         // students page (/students)
@@ -151,7 +163,7 @@ const server = createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
       } catch (err) {
-        handleError({
+        return handleError({
           res,
           statusCode: 500,
           message: errorCompilingPugTemplate,
@@ -187,7 +199,7 @@ const server = createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
       } catch (err) {
-        handleError({
+        return handleError({
           res,
           statusCode: 500,
           message: errorCompilingPugTemplate,
@@ -196,7 +208,12 @@ const server = createServer((req, res) => {
       }
     }
   } catch (err) {
-    handleError({ res, statusCode: 500, message: internalServerError, err });
+    return handleError({
+      res,
+      statusCode: 500,
+      message: internalServerError,
+      err,
+    });
   }
 });
 
