@@ -1,10 +1,11 @@
 const http = require('http');
 const pug = require('pug');
 const fs = require('fs');
-const server_utils = require('./utils/server.utils');
-const student_utils = require('./utils/student.utils');
-const string_utils = require('./utils/string.utils');
-const date_utils = require('./utils/date.utils');
+const server_utils = require('./src/utils/server.utils');
+const student_utils = require('./src/utils/student.utils');
+const string_utils = require('./src/utils/string.utils');
+const error_utils = require('./src/utils/error.utils');
+const date_utils = require('./src/utils/date.utils');
 require('dotenv').config();
 
 const { createServer } = http;
@@ -15,10 +16,22 @@ const { readFileSync, writeFileSync } = fs;
 const { APP_PORT, APP_LOCALHOST } = process.env;
 
 // functions from utils files
-const { defineEnvMessage, handleError } = server_utils;
+const { defineEnvMessage } = server_utils;
 const { filterStudentsArray } = student_utils;
 const { capitalize } = string_utils;
 const { formatDate } = date_utils;
+const { handleError, errorMessages } = error_utils;
+
+// destructure errorMessages
+const {
+  errorLoadingStylesheet,
+  errorReadingJSON,
+  errorRetrievingStudents,
+  invalidDataFormat,
+  errorProcessingFormData,
+  errorCompilingPugTemplate,
+  internalServerError,
+} = errorMessages;
 
 const server = createServer((req, res) => {
   try {
@@ -32,8 +45,12 @@ const server = createServer((req, res) => {
         res.write(css);
         res.end();
       } catch (err) {
-        const message = 'Error loading the stylesheet file';
-        handleError({ res, statusCode: 404, message, err });
+        handleError({
+          res,
+          statusCode: 404,
+          message: errorLoadingStylesheet,
+          err,
+        });
       }
       return;
     }
@@ -43,8 +60,7 @@ const server = createServer((req, res) => {
     try {
       JSONFile = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
     } catch (err) {
-      const message = 'Error reading the JSON file';
-      handleError({ res, statusCode: 500, message, err });
+      handleError({ res, statusCode: 500, message: errorReadingJSON, err });
       return;
     }
 
@@ -52,8 +68,7 @@ const server = createServer((req, res) => {
     const { students } = JSONFile;
 
     if (!students) {
-      const message = 'Error retrieving students';
-      handleError({ res, statusCode: 404, message });
+      handleError({ res, statusCode: 404, message: errorRetrievingStudents });
       return;
     }
 
@@ -81,8 +96,7 @@ const server = createServer((req, res) => {
 
           // if we receive undefined or empty strings, display an error message
           if (!name || name === '' || !birth || birth === '') {
-            const message = 'Invalid data format.';
-            handleError({ res, statusCode: 400, message });
+            handleError({ res, statusCode: 400, message: invalidDataFormat });
           } else {
             // if everything is ok, add new student in students array
             students.push({ name, birth });
@@ -99,8 +113,12 @@ const server = createServer((req, res) => {
             res.end();
           }
         } catch (err) {
-          const message = 'Error processing the form data';
-          handleError({ res, statusCode: 500, message, err });
+          handleError({
+            res,
+            statusCode: 500,
+            message: errorProcessingFormData,
+            err,
+          });
         }
       });
       return;
@@ -109,26 +127,36 @@ const server = createServer((req, res) => {
     if (url === '/' && method === 'GET') {
       try {
         // compile pug home file to send it in response to client
-        const compile = compileFile('./views/home.pug', { pretty: true });
+        const compile = compileFile('./src/views/home.pug', { pretty: true });
         const result = compile();
 
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
       } catch (err) {
-        const message = 'Error compiling the Pug template';
-        handleError({ res, statusCode: 500, message, err });
+        handleError({
+          res,
+          statusCode: 500,
+          message: errorCompilingPugTemplate,
+          err,
+        });
       }
     } else if (url === '/students' && method === 'GET') {
       try {
         // students page (/students)
-        const compile = compileFile('./views/students.pug', { pretty: true });
+        const compile = compileFile('./src/views/students.pug', {
+          pretty: true,
+        });
         const result = compile({ students, formatDate });
 
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
       } catch (err) {
-        const message = 'Error compiling the Pug template';
-        handleError({ res, statusCode: 500, message, err });
+        handleError({
+          res,
+          statusCode: 500,
+          message: errorCompilingPugTemplate,
+          err,
+        });
       }
     } else if (url.includes('delete') && method === 'GET') {
       // retrieve name from url (url is /students/delete/{name})
@@ -151,19 +179,24 @@ const server = createServer((req, res) => {
     } else {
       try {
         // not found page
-        const compile = compileFile('./views/not-found.pug', { pretty: true });
+        const compile = compileFile('./src/views/not-found.pug', {
+          pretty: true,
+        });
         const result = compile();
 
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(result);
       } catch (err) {
-        const message = 'Error compiling the Pug template';
-        handleError({ res, statusCode: 500, message, err });
+        handleError({
+          res,
+          statusCode: 500,
+          message: errorCompilingPugTemplate,
+          err,
+        });
       }
     }
   } catch (err) {
-    const message = 'Internal server error';
-    handleError({ res, statusCode: 500, message, err });
+    handleError({ res, statusCode: 500, message: internalServerError, err });
   }
 });
 

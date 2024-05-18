@@ -19,15 +19,4 @@ const defineEnvMessage = () => {
   return environmentMessage;
 };
 
-// error handler
-const handleError = ({ res, statusCode, message, err }) => {
-  res.writeHead(statusCode, { 'Content-Type': 'text/plain; charset=utf-8' });
-  const errorMessage =
-    APP_ENV === 'development' && err ? `${message}: ${err}` : message;
-  res.end(errorMessage);
-};
-
-module.exports = {
-  defineEnvMessage,
-  handleError,
-};
+module.exports = { defineEnvMessage };
