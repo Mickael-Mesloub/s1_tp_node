@@ -4,11 +4,12 @@ block title
     title TP Node - Students
 block content
     h2 Students
+    //- if students array is empty, show a message and invite user to add a new student
+    if !students || students.length === 0
+        p.no-student-msg No student registered yet.
+        a.go-back-home(href="/") Add a new student
+    else
     ul.student-list
-        //- if students array doesn't exist or if it is empty, show a msg
-        if !students || students.length === 0
-            p.no-student-msg No student registered yet. 
-        else
-            each student, index in students
-                li.student-list-item= `${index + 1} - Name: ${student.name} - Birthdate: ${formatDate(student.birth)}`
-                    a.delete-student-btn(href=`/students/delete/${student.name}`) Delete student
+        each student, index in students
+            li.student-list-item= `${index + 1} - Name: ${student.name} - Birthdate: ${formatDate(student.birth)}`
+                a.delete-student-btn(href=`/students/delete/${student.name}`) Delete student
