@@ -1,19 +1,5 @@
 extends layout.pug
 
-block scripts
-
-    script. 
-        //- script to delete students
-        document.addEventListener('DOMContentLoaded', () => {
-            const deleteBtns = document.querySelectorAll('.delete-student-btn');
-            deleteBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    console.log('clicked', e.target.dataset)
-                })
-            });
-        });
-
-
 block title
     title TP Node - Students
 block content
