@@ -9,7 +9,7 @@ const { compileFile } = pug;
 const { readFileSync, writeFileSync } = fs;
 
 // env variables from .env file
-const { APP_ENV, APP_PORT, APP_LOCALHOST } = process.env;
+const { APP_PORT, APP_LOCALHOST } = process.env;
 
 // functions from utils file
 const {
@@ -33,7 +33,7 @@ const server = createServer((req, res) => {
         res.end();
       } catch (err) {
         const message = 'Error loading the stylesheet file';
-        handleError({ env: APP_ENV, res, statusCode: 404, message, err });
+        handleError({ res, statusCode: 404, message, err });
       }
       return;
     }
@@ -44,7 +44,7 @@ const server = createServer((req, res) => {
       JSONFile = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
     } catch (err) {
       const message = 'Error reading the JSON file';
-      handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+      handleError({ res, statusCode: 500, message, err });
       return;
     }
 
@@ -53,7 +53,7 @@ const server = createServer((req, res) => {
 
     if (!students) {
       const message = 'Error retrieving students';
-      handleError({ env: APP_ENV, res, statusCode: 404, message });
+      handleError({ res, statusCode: 404, message });
       return;
     }
 
@@ -82,7 +82,7 @@ const server = createServer((req, res) => {
           // if we receive undefined or empty strings, display an error message
           if (!name || name === '' || !birth || birth === '') {
             const message = 'Invalid data format.';
-            handleError({ env: APP_ENV, res, statusCode: 400, message });
+            handleError({ res, statusCode: 400, message });
           } else {
             // if everything is ok, add new student in students array
             students.push({ name, birth });
@@ -100,7 +100,7 @@ const server = createServer((req, res) => {
           }
         } catch (err) {
           const message = 'Error processing the form data';
-          handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+          handleError({ res, statusCode: 500, message, err });
         }
       });
       return;
@@ -116,7 +116,7 @@ const server = createServer((req, res) => {
         res.end(result);
       } catch (err) {
         const message = 'Error compiling the Pug template';
-        handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+        handleError({ res, statusCode: 500, message, err });
       }
     } else if (url === '/students' && method === 'GET') {
       try {
@@ -128,7 +128,7 @@ const server = createServer((req, res) => {
         res.end(result);
       } catch (err) {
         const message = 'Error compiling the Pug template';
-        handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+        handleError({ res, statusCode: 500, message, err });
       }
     } else if (url.includes('delete') && method === 'GET') {
       // retrieve name from url (url is /students/delete/{name})
@@ -158,16 +158,16 @@ const server = createServer((req, res) => {
         res.end(result);
       } catch (err) {
         const message = 'Error compiling the Pug template';
-        handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+        handleError({ res, statusCode: 500, message, err });
       }
     }
   } catch (err) {
     const message = 'Internal server error';
-    handleError({ env: APP_ENV, res, statusCode: 500, message, err });
+    handleError({ res, statusCode: 500, message, err });
   }
 });
 
 server.listen(APP_PORT || 9000, APP_LOCALHOST, () => {
   console.log(`Server is running at http://${APP_LOCALHOST}:${APP_PORT}`);
-  console.log(defineEnvMessage(APP_ENV));
+  console.log(defineEnvMessage());
 });
