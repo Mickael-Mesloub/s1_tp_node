@@ -1,7 +1,10 @@
 const http = require('http');
 const pug = require('pug');
 const fs = require('fs');
-const u = require('./utils/utils');
+const server_utils = require('./utils/server.utils');
+const student_utils = require('./utils/student.utils');
+const string_utils = require('./utils/string.utils');
+const date_utils = require('./utils/date.utils');
 require('dotenv').config();
 
 const { createServer } = http;
@@ -11,14 +14,11 @@ const { readFileSync, writeFileSync } = fs;
 // env variables from .env file
 const { APP_PORT, APP_LOCALHOST } = process.env;
 
-// functions from utils file
-const {
-  defineEnvMessage,
-  handleError,
-  formatDate,
-  capitalize,
-  filterStudentsArray,
-} = u;
+// functions from utils files
+const { defineEnvMessage, handleError } = server_utils;
+const { filterStudentsArray } = student_utils;
+const { capitalize } = string_utils;
+const { formatDate } = date_utils;
 
 const server = createServer((req, res) => {
   try {
