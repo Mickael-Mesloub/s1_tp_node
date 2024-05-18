@@ -1,3 +1,7 @@
+require('dotenv').config();
+
+const { APP_ENV } = process.env;
+
 // error handler
 const handleError = ({ res, statusCode, message, err }) => {
   res.writeHead(statusCode, { 'Content-Type': 'text/plain; charset=utf-8' });
