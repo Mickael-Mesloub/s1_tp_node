@@ -1,8 +1,8 @@
 // *********** IMPORTS *********** \\
 
 const http = require('http');
-require('dotenv').config();
 const { createServer } = http;
+require('dotenv').config();
 
 // imports from utils files
 const { defineEnvMessage } = require('./src/utils/server.utils');
@@ -20,11 +20,7 @@ const { APP_PORT, APP_LOCALHOST } = process.env;
 const { errorRetrievingStudents, internalServerError } = errorMessages;
 
 // destructure pageHelpers
-const {
-  renderStudentsPage,
-  renderHomePage,
-  renderNotFoundPage,
-} = require('./src/helpers/pageHelpers');
+const { renderPage } = require('./src/helpers/pageHelpers');
 
 // destructure studentHelpers
 const { addStudent, deleteStudent } = require('./src/helpers/studentHelpers');
@@ -54,7 +50,7 @@ const server = createServer((req, res) => {
 
     // render home page
     else if (url === '/' && method === 'GET') {
-      renderHomePage({ res });
+      renderPage({ page: 'home', res });
       return;
     }
 
@@ -66,7 +62,7 @@ const server = createServer((req, res) => {
 
     // render students page
     else if (url === '/students' && method === 'GET') {
-      renderStudentsPage({ res, students });
+      renderPage({ page: 'students', res, students });
       return;
     }
 
@@ -78,7 +74,7 @@ const server = createServer((req, res) => {
 
     // render not-found page if wee try to reach a route different from the ones above
     else {
-      renderNotFoundPage({ res });
+      renderPage({ page: 'not-found', res });
       return;
     }
 
