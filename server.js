@@ -22,8 +22,7 @@ const {
 
 const server = createServer((req, res) => {
   try {
-    const url = req.url;
-    const method = req.method;
+    const { url, method } = req;
 
     // load CSS file
     if (url && url.includes('styles')) {
