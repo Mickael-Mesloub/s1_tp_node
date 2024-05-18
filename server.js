@@ -1,76 +1,43 @@
-const http = require('http');
-const pug = require('pug');
-const fs = require('fs');
-const server_utils = require('./src/utils/server.utils');
-const student_utils = require('./src/utils/student.utils');
-const string_utils = require('./src/utils/string.utils');
-const error_utils = require('./src/utils/error.utils');
-const date_utils = require('./src/utils/date.utils');
-require('dotenv').config();
+// *********** IMPORTS *********** \\
 
+const http = require('http');
+require('dotenv').config();
 const { createServer } = http;
-const { compileFile } = pug;
-const { readFileSync, writeFileSync } = fs;
+
+// imports from utils files
+const { defineEnvMessage } = require('./src/utils/server.utils');
+const { handleError, errorMessages } = require('./src/utils/error.utils');
+
+// imports from helpers files
+const { loadCSS, JSONFile } = require('./src/helpers/fileHelpers');
+
+// *********** CONSTANTS *********** \\
 
 // env variables from .env file
 const { APP_PORT, APP_LOCALHOST } = process.env;
 
-// functions from utils files
-const { defineEnvMessage } = server_utils;
-const { filterStudentsArray } = student_utils;
-const { capitalize } = string_utils;
-const { formatDate } = date_utils;
-const { handleError, errorMessages } = error_utils;
-
 // destructure errorMessages
+const { errorRetrievingStudents, internalServerError } = errorMessages;
+
+// destructure pageHelpers
 const {
-  errorLoadingStylesheet,
-  errorReadingJSON,
-  errorRetrievingStudents,
-  invalidDataFormat,
-  errorProcessingFormData,
-  errorCompilingPugTemplate,
-  internalServerError,
-} = errorMessages;
+  renderStudentsPage,
+  renderHomePage,
+  renderNotFoundPage,
+} = require('./src/helpers/pageHelpers');
+
+// destructure studentHelpers
+const { addStudent, deleteStudent } = require('./src/helpers/studentHelpers');
+
+// *********** SERVER *********** \\
 
 const server = createServer((req, res) => {
   try {
     const { url, method } = req;
-
-    // load CSS file
-    if (url && url.includes('styles')) {
-      try {
-        const css = readFileSync(`${__dirname}/${url}`);
-        res.writeHead(200, { 'Content-Type': 'text/css' });
-        res.write(css);
-        res.end();
-      } catch (err) {
-        return handleError({
-          res,
-          statusCode: 404,
-          message: errorLoadingStylesheet,
-          err,
-        });
-      }
-      return;
-    }
-
-    // parse data.json file
-    let JSONFile;
-    try {
-      JSONFile = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
-    } catch (err) {
-      return handleError({
-        res,
-        statusCode: 500,
-        message: errorReadingJSON,
-        err,
-      });
-    }
-
     // retrieve the array of students from JSON file
-    const { students } = JSONFile;
+    const { students } = JSONFile();
 
+    // send error if cannot retrieve students
     if (!students) {
       return handleError({
         res,
@@ -79,134 +46,43 @@ const server = createServer((req, res) => {
       });
     }
 
-    if (url === '/' && method === 'POST') {
-      let body = '';
-      req.on('data', (chunk) => {
-        body += chunk;
-      });
-      req.on('end', () => {
-        try {
-          let name;
-          let birth;
-
-          // regex to check if we receive name={name}&birth={date}
-          const regex = /name=([^&]+)&birth=([^&]+)/;
-
-          // check if the response body matches the regex
-          const match = body.match(regex);
-
-          // assign values to name and birth if it matches
-          if (match) {
-            name = capitalize(match[1]);
-            birth = match[2];
-          }
-
-          // if we receive undefined or empty strings, display an error message
-          if (!name || name === '' || !birth || birth === '') {
-            return handleError({
-              res,
-              statusCode: 400,
-              message: invalidDataFormat,
-            });
-          } else {
-            // if everything is ok, add new student in students array
-            students.push({ name, birth });
-
-            const newData = JSON.stringify({ students });
-            // rewrite JSON file with the new array (with the student freshly created)
-            writeFileSync('./Data/data.json', newData);
-            console.log(
-              `New student "${name}" added and JSON file updated successfully!`
-            );
-
-            // redirect to /students after handling the request
-            res.writeHead(301, { Location: '/students' });
-            res.end();
-          }
-        } catch (err) {
-          return handleError({
-            res,
-            statusCode: 500,
-            message: errorProcessingFormData,
-            err,
-          });
-        }
-      });
+    // load CSS file
+    if (url.includes('styles')) {
+      loadCSS({ res, url });
       return;
     }
 
-    if (url === '/' && method === 'GET') {
-      try {
-        // compile pug home file to send it in response to client
-        const compile = compileFile('./src/views/home.pug', { pretty: true });
-        const result = compile();
-
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(result);
-      } catch (err) {
-        return handleError({
-          res,
-          statusCode: 500,
-          message: errorCompilingPugTemplate,
-          err,
-        });
-      }
+    // render home page
+    else if (url === '/' && method === 'GET') {
+      renderHomePage({ res });
       return;
-    } else if (url === '/students' && method === 'GET') {
-      try {
-        // students page (/students)
-        const compile = compileFile('./src/views/students.pug', {
-          pretty: true,
-        });
-        const result = compile({ students, formatDate });
-
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(result);
-      } catch (err) {
-        return handleError({
-          res,
-          statusCode: 500,
-          message: errorCompilingPugTemplate,
-          err,
-        });
-      }
-    } else if (url.includes('delete') && method === 'GET') {
-      // retrieve name from url (url is /students/delete/{name})
-      const name = url.split('/').pop();
-
-      // new array without the student we want to delete
-      const newStudents = filterStudentsArray({ students, name });
-
-      const newData = JSON.stringify({ students: newStudents });
-
-      // rewrite the JSON file with the new array (without the student we want to delete)
-      writeFileSync('./Data/data.json', newData);
-      console.log(
-        `Student "${name}" deleted and JSON file updated successfully!`
-      );
-
-      // redirect to /students after deleting student to update the student list
-      res.writeHead(301, { Location: '/students' });
-      res.end();
-    } else {
-      try {
-        // not found page
-        const compile = compileFile('./src/views/not-found.pug', {
-          pretty: true,
-        });
-        const result = compile();
-
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(result);
-      } catch (err) {
-        return handleError({
-          res,
-          statusCode: 500,
-          message: errorCompilingPugTemplate,
-          err,
-        });
-      }
     }
+
+    // add a new student from home page thanks to the form
+    else if (url === '/' && method === 'POST') {
+      addStudent({ req, res, students });
+      return;
+    }
+
+    // render students page
+    else if (url === '/students' && method === 'GET') {
+      renderStudentsPage({ res, students });
+      return;
+    }
+
+    // delete a student
+    else if (url.includes('delete') && method === 'GET') {
+      deleteStudent({ res, url, students });
+      return;
+    }
+
+    // render not-found page if wee try to reach a route different from the ones above
+    else {
+      renderNotFoundPage({ res });
+      return;
+    }
+
+    // send error if a not handled error occurs
   } catch (err) {
     return handleError({
       res,
