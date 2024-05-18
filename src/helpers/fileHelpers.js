@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { handleError, errorMessages } = require('../utils/error.utils');
-
 const { readFileSync } = fs;
-
 const { errorLoadingStylesheet, errorReadingJSON } = errorMessages;
 
+// loads the CSS file
 const loadCSS = ({ res, url }) => {
   const cssPath = path.join(__dirname, '..', url);
 
@@ -24,10 +23,11 @@ const loadCSS = ({ res, url }) => {
   }
 };
 
+// returns the JSON file containing the students data
 const JSONFile = () => {
-  // parse data.json file
   let JSONFile;
   try {
+    // parse data.json file
     JSONFile = JSON.parse(readFileSync('./Data/data.json', 'utf-8'));
   } catch (err) {
     return handleError({
