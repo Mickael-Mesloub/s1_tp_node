@@ -1,29 +1,24 @@
 // *********** IMPORTS *********** \\
 
-const http = require('http');
-const { createServer } = http;
+const { createServer } = require('http');
 require('dotenv').config();
 
 // imports from utils files
 const { defineEnvMessage } = require('./src/utils/server.utils');
 const { handleError, errorMessages } = require('./src/utils/error.utils');
 
-// imports from helpers files
+// imports from helper files
 const { loadCSS, JSONFile } = require('./src/helpers/fileHelpers');
+const { renderPage } = require('./src/helpers/pageHelpers');
+const { addStudent, deleteStudent } = require('./src/helpers/studentHelpers');
 
 // *********** CONSTANTS *********** \\
 
 // env variables from .env file
 const { APP_PORT, APP_LOCALHOST } = process.env;
 
-// destructure errorMessages
+// destructure errorMessages from error utils
 const { errorRetrievingStudents, internalServerError } = errorMessages;
-
-// destructure pageHelpers
-const { renderPage } = require('./src/helpers/pageHelpers');
-
-// destructure studentHelpers
-const { addStudent, deleteStudent } = require('./src/helpers/studentHelpers');
 
 // *********** SERVER *********** \\
 

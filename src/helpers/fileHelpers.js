@@ -1,7 +1,8 @@
-const fs = require('fs');
+const { readFileSync } = require('fs');
 const path = require('path');
 const { handleError, errorMessages } = require('../utils/error.utils');
-const { readFileSync } = fs;
+
+// destructure errorMessages from error utils
 const { errorLoadingStylesheet, errorReadingJSON } = errorMessages;
 
 // loads the CSS file

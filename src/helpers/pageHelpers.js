@@ -1,7 +1,8 @@
-const pug = require('pug');
+const { compileFile } = require('pug');
 const { handleError, errorMessages } = require('../utils/error.utils');
 const { formatDate } = require('../utils/date.utils');
-const { compileFile } = pug;
+
+// destructure errorMessages from error utils
 const { errorCompilingPugTemplate } = errorMessages;
 
 // renders a page depending on the value of the "page" param

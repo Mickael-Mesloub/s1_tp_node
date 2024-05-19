@@ -1,8 +1,9 @@
-const fs = require('fs');
+const { writeFileSync } = require('fs');
 const { handleError, errorMessages } = require('../utils/error.utils');
 const { capitalize } = require('../utils/string.utils');
 const { filterStudentsArray } = require('../utils/student.utils');
-const { writeFileSync } = fs;
+
+// destructure errorMessages from error utils
 const { invalidDataFormat, errorProcessingFormData } = errorMessages;
 
 // creates a new student and adds it in the array of students of the data.json file
